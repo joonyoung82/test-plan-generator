@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Plan Generator | AI-Powered</title>
+  <meta name="description" content="AI-powered tool that transforms project descriptions into structured test plans with TestRail-compatible CSV export.">
+  <meta name="author" content="Joon Lee">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css?family=EB+Garamond:600,700|Quattrocento+Sans:400,700" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="https://joonyoung82.github.io/" class="nav-back">Portfolio</a>
+      <span class="nav-title">Test Plan Generator</span>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <span id="themeIcon"></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <h1>Test Plan Generator</h1>
+      <p class="subtitle">Turn project descriptions into structured test plans</p>
+    </header>
+
+    <!-- API KEY BAR -->
+    <section class="card api-key-section">
+      <button class="api-key-toggle" id="apiKeyToggle">
+        <span class="lock-icon">&#x1f512;</span>
+        <span id="apiKeyStatus">Set API Key</span>
+        <span class="chevron" id="apiKeyChevron">&#9662;</span>
+      </button>
+      <div class="api-key-body" id="apiKeyBody">
+        <div class="api-key-input-wrap">
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+          <button class="btn-icon" id="apiKeyVisToggle" aria-label="Toggle key visibility" title="Show/hide key">
+            <span id="apiKeyVisIcon">&#x1f441;</span>
+          </button>
+        </div>
+        <div class="api-key-actions">
+          <button class="btn btn--small" id="apiKeySave">Save Key</button>
+          <button class="btn btn--small btn--ghost" id="apiKeyForget">Forget Key</button>
+        </div>
+        <p class="api-key-note">Your key stays in your browser only &mdash; never sent to any server except Anthropic's API.</p>
+      </div>
+    </section>
+
+    <!-- INPUT -->
+    <section class="card">
+      <label for="projectInput" class="input-label">Project Description</label>
+      <textarea id="projectInput" rows="10" placeholder="Paste your PRD, Confluence page, user story, or any project description here...&#10;&#10;Example: We're building a new user registration flow that supports email/password and social login (Google, Apple). Users must verify their email before accessing the dashboard. Password requirements: 8+ chars, 1 uppercase, 1 number. The flow should work on iOS Safari, Chrome, and Firefox."></textarea>
+
+      <details class="optional-fields" id="optionalFields">
+        <summary class="optional-toggle">Configure test options</summary>
+        <div class="optional-body">
+          <div class="field-group">
+            <label for="platformField">Platform</label>
+            <select id="platformField">
+              <option value="">-- Auto-detect --</option>
+              <option value="iOS">iOS</option>
+              <option value="Android">Android</option>
+              <option value="Web">Web</option>
+              <option value="Cross-platform">Cross-platform</option>
+              <option value="macOS">macOS</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Test Types</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label"><input type="checkbox" value="Functional" checked> Functional</label>
+              <label class="checkbox-label"><input type="checkbox" value="Negative"> Negative</label>
+              <label class="checkbox-label"><input type="checkbox" value="Boundary"> Boundary</label>
+              <label class="checkbox-label"><input type="checkbox" value="Integration"> Integration</label>
+              <label class="checkbox-label"><input type="checkbox" value="Regression"> Regression</label>
+              <label class="checkbox-label"><input type="checkbox" value="Accessibility"> Accessibility</label>
+              <label class="checkbox-label"><input type="checkbox" value="Performance"> Performance</label>
+              <label class="checkbox-label"><input type="checkbox" value="Security"> Security</label>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="coverageField">Coverage Level</label>
+            <select id="coverageField">
+              <option value="comprehensive">Comprehensive</option>
+              <option value="critical">Critical paths only</option>
+              <option value="smoke">Smoke test</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
+      <button class="btn btn--primary" id="generateBtn">
+        <span id="generateText">Generate Test Plan</span>
+        <span class="spinner" id="generateSpinner"></span>
+      </button>
+    </section>
+
+    <!-- ERROR -->
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- OUTPUT -->
+    <section class="card output-section" id="outputSection">
+      <div class="output-header">
+        <h2>Generated Test Plan</h2>
+        <div class="output-actions">
+          <button class="btn btn--small btn--accent" id="csvBtn">Download TestRail CSV</button>
+          <button class="btn btn--small" id="copyMdBtn">Copy Markdown</button>
+          <button class="btn btn--small" id="copyTextBtn">Copy Text</button>
+          <button class="btn btn--small btn--ghost" id="clearBtn">Clear</button>
+        </div>
+      </div>
+
+      <!-- SUMMARY TAB -->
+      <div class="output-tabs">
+        <button class="tab-btn active" data-tab="rendered">Rendered</button>
+        <button class="tab-btn" data-tab="raw">Raw Markdown</button>
+      </div>
+
+      <div class="tab-content active" id="tab-rendered">
+        <div class="output-body rendered" id="outputRendered"></div>
+      </div>
+      <div class="tab-content" id="tab-raw">
+        <div class="output-body mono" id="outputRaw"></div>
+      </div>
+
+      <div class="copy-toast" id="copyToast">Copied!</div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Built by <a href="https://joonyoung82.github.io/" target="_blank">Joon Lee</a></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
