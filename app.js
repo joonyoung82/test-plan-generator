@@ -1,3 +1,5 @@
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
 /* ============================================================
    THEME
    ============================================================ */
@@ -27,44 +29,51 @@ document.getElementById('themeToggle').addEventListener('click', function () {
 });
 
 /* ============================================================
-   API KEY
+   LOCAL MODEL (WebLLM)
    ============================================================ */
-var apiKeyInput = document.getElementById('apiKeyInput');
-var apiKeyBody = document.getElementById('apiKeyBody');
-var apiKeyChevron = document.getElementById('apiKeyChevron');
-var apiKeyStatus = document.getElementById('apiKeyStatus');
-var apiKeyVisIcon = document.getElementById('apiKeyVisIcon');
+var engine = null;
+var modelLoaded = false;
 
-(function loadKey() {
-  var key = localStorage.getItem('tpg-api-key');
-  if (key) {
-    apiKeyInput.value = key;
-    apiKeyStatus.textContent = 'API Key Saved';
+var modelSelect = document.getElementById('modelSelect');
+var loadModelBtn = document.getElementById('loadModelBtn');
+var modelStatus = document.getElementById('modelStatus');
+var modelProgressWrap = document.getElementById('modelProgressWrap');
+var modelProgressFill = document.getElementById('modelProgressFill');
+var modelProgressText = document.getElementById('modelProgressText');
+
+loadModelBtn.addEventListener('click', async function () {
+  if (modelLoaded) return;
+
+  var modelId = modelSelect.value;
+  loadModelBtn.disabled = true;
+  loadModelBtn.textContent = 'Loading...';
+  modelSelect.disabled = true;
+  modelProgressWrap.classList.add('is-visible');
+  modelStatus.textContent = 'Loading...';
+  modelStatus.classList.remove('is-ready');
+
+  try {
+    engine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: function (report) {
+        var pct = Math.round(report.progress * 100);
+        modelProgressFill.style.width = pct + '%';
+        modelProgressText.textContent = report.text || ('Downloading... ' + pct + '%');
+      }
+    });
+
+    modelLoaded = true;
+    modelStatus.textContent = 'Ready';
+    modelStatus.classList.add('is-ready');
+    loadModelBtn.textContent = 'Loaded';
+    modelProgressWrap.classList.remove('is-visible');
+  } catch (err) {
+    modelStatus.textContent = 'Failed';
+    loadModelBtn.textContent = 'Retry';
+    loadModelBtn.disabled = false;
+    modelSelect.disabled = false;
+    modelProgressText.textContent = 'Error: ' + err.message;
+    console.error('WebLLM load error:', err);
   }
-})();
-
-document.getElementById('apiKeyToggle').addEventListener('click', function () {
-  var isOpen = apiKeyBody.classList.toggle('is-open');
-  apiKeyChevron.classList.toggle('is-open', isOpen);
-});
-
-document.getElementById('apiKeyVisToggle').addEventListener('click', function () {
-  var isPassword = apiKeyInput.type === 'password';
-  apiKeyInput.type = isPassword ? 'text' : 'password';
-  apiKeyVisIcon.textContent = isPassword ? '\uD83D\uDE48' : '\uD83D\uDC41';
-});
-
-document.getElementById('apiKeySave').addEventListener('click', function () {
-  var key = apiKeyInput.value.trim();
-  if (!key) return;
-  localStorage.setItem('tpg-api-key', key);
-  apiKeyStatus.textContent = 'API Key Saved';
-});
-
-document.getElementById('apiKeyForget').addEventListener('click', function () {
-  localStorage.removeItem('tpg-api-key');
-  apiKeyInput.value = '';
-  apiKeyStatus.textContent = 'Set API Key';
 });
 
 /* ============================================================
@@ -135,9 +144,9 @@ var rawMarkdown = '';
 
 generateBtn.addEventListener('click', async function () {
   hideError();
-  var key = localStorage.getItem('tpg-api-key') || apiKeyInput.value.trim();
-  if (!key) {
-    showError('Please enter your Claude API key first.');
+
+  if (!modelLoaded || !engine) {
+    showError('Please load a local model first.');
     return;
   }
 
@@ -170,33 +179,17 @@ generateBtn.addEventListener('click', async function () {
   outputSection.classList.remove('is-visible');
 
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6-20250514',
-        max_tokens: 4096,
-        system: SYSTEM_PROMPT,
-        messages: [
-          { role: 'user', content: userMessage }
-        ]
-      })
+    var reply = await engine.chat.completions.create({
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userMessage }
+      ],
+      max_tokens: 4096,
+      temperature: 0.7
     });
 
-    if (!response.ok) {
-      var errData = await response.json().catch(function () { return {}; });
-      var errText = (errData.error && errData.error.message) || response.statusText || 'API request failed';
-      throw new Error(errText);
-    }
-
-    var data = await response.json();
-    var text = data.content && data.content[0] && data.content[0].text;
-    if (!text) throw new Error('No response from API');
+    var text = reply.choices[0].message.content;
+    if (!text) throw new Error('No response from model');
 
     rawMarkdown = text;
     outputRendered.innerHTML = renderMarkdown(text);

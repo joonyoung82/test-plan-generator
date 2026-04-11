@@ -162,81 +162,79 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ============================================================
-   API KEY SECTION
+   LOCAL MODEL SECTION
    ============================================================ */
-.api-key-toggle {
+.model-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  color: var(--text-muted);
-  padding: 0;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.api-key-toggle:hover { color: var(--text-primary); }
-.lock-icon { font-size: 16px; }
-
-.chevron {
-  margin-left: auto;
-  font-size: 12px;
-  transition: transform 0.2s;
+.model-header label {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0;
 }
 
-.chevron.is-open { transform: rotate(180deg); }
-
-.api-key-body {
-  display: none;
-  margin-top: 16px;
+.model-status {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-faint);
 }
 
-.api-key-body.is-open { display: block; }
+.model-status.is-ready {
+  color: #16a34a;
+}
 
-.api-key-input-wrap {
+[data-theme="dark"] .model-status.is-ready {
+  color: #4ade80;
+}
+
+.model-controls {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
 }
 
-.api-key-input-wrap input {
+.model-controls select {
   flex: 1;
-  padding: 10px 14px;
-  border: 1.5px solid var(--border-light);
-  border-radius: 8px;
-  background-color: var(--input-bg);
-  color: var(--text-body);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
 }
 
-.api-key-input-wrap input:focus { border-color: var(--text-subtle); }
-
-.btn-icon {
-  background: none;
-  border: 1.5px solid var(--border-light);
-  border-radius: 8px;
-  cursor: pointer;
-  padding: 8px 10px;
-  font-size: 16px;
-  color: var(--text-muted);
-  transition: border-color 0.2s;
-}
-
-.btn-icon:hover { border-color: var(--text-subtle); }
-
-.api-key-actions {
-  display: flex;
-  gap: 8px;
+.model-progress-wrap {
+  display: none;
   margin-bottom: 10px;
 }
 
-.api-key-note {
+.model-progress-wrap.is-visible {
+  display: block;
+}
+
+.model-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.model-progress-fill {
+  width: 0%;
+  height: 100%;
+  background-color: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.model-progress-text {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.model-note {
   font-size: 13px;
   color: var(--text-faint);
   line-height: 1.5;

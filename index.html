@@ -8,6 +8,7 @@
   <meta name="author" content="Joon Lee">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css?family=EB+Garamond:600,700|Quattrocento+Sans:400,700" rel="stylesheet">
+  <script type="module" src="app.js"></script>
 </head>
 <body>
 
@@ -30,26 +31,28 @@
       <p class="subtitle">Turn project descriptions into structured test plans</p>
     </header>
 
-    <!-- API KEY BAR -->
-    <section class="card api-key-section">
-      <button class="api-key-toggle" id="apiKeyToggle">
-        <span class="lock-icon">&#x1f512;</span>
-        <span id="apiKeyStatus">Set API Key</span>
-        <span class="chevron" id="apiKeyChevron">&#9662;</span>
-      </button>
-      <div class="api-key-body" id="apiKeyBody">
-        <div class="api-key-input-wrap">
-          <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
-          <button class="btn-icon" id="apiKeyVisToggle" aria-label="Toggle key visibility" title="Show/hide key">
-            <span id="apiKeyVisIcon">&#x1f441;</span>
-          </button>
-        </div>
-        <div class="api-key-actions">
-          <button class="btn btn--small" id="apiKeySave">Save Key</button>
-          <button class="btn btn--small btn--ghost" id="apiKeyForget">Forget Key</button>
-        </div>
-        <p class="api-key-note">Your key stays in your browser only &mdash; never sent to any server except Anthropic's API.</p>
+    <!-- LOCAL MODEL -->
+    <section class="card model-section">
+      <div class="model-header">
+        <label for="modelSelect">Local AI Model</label>
+        <span class="model-status" id="modelStatus">Not loaded</span>
       </div>
+      <div class="model-controls">
+        <select id="modelSelect">
+          <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi 3.5 Mini (3.8B) &mdash; Recommended</option>
+          <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 (3B)</option>
+          <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 (1B) &mdash; Fastest</option>
+          <option value="SmolLM2-1.7B-Instruct-q4f16_1-MLC">SmolLM2 (1.7B)</option>
+        </select>
+        <button class="btn btn--small btn--accent" id="loadModelBtn">Load Model</button>
+      </div>
+      <div class="model-progress-wrap" id="modelProgressWrap">
+        <div class="model-progress-bar">
+          <div class="model-progress-fill" id="modelProgressFill"></div>
+        </div>
+        <p class="model-progress-text" id="modelProgressText">Downloading model...</p>
+      </div>
+      <p class="model-note">Runs entirely in your browser via WebGPU. No API key needed. First load downloads the model (~1-2 GB).</p>
     </section>
 
     <!-- INPUT -->
@@ -140,6 +143,5 @@
     <p>Built by <a href="https://joonyoung82.github.io/" target="_blank">Joon Lee</a></p>
   </footer>
 
-  <script src="app.js"></script>
 </body>
 </html>
